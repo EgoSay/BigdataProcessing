@@ -7,7 +7,6 @@
     <groupId>com.cjw.bigdata</groupId>
     <artifactId>BigdataProcessing</artifactId>
     <version>1.0</version>
-
     <properties>
         <scala.version>2.11.12</scala.version>
         <kafka.version>1.0.0</kafka.version>
