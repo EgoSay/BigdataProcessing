@@ -64,10 +64,13 @@ def generate_log(count=10):
     with open("./access.log", "a+") as f:
 
         while count >= 1:
-            query_log = "{local_time}\t{url}\t{ip}\t{referer}\t{status_code}".format(url=sample_url(), ip=sample_ip(),
-                                                                                     referer=sample_referer(),
-                                                                                     status_code=sample_status_code(),
-                                                                                     local_time=time_str)
+            query_log = "{ip}\t{local_time}\t\"GET /{url} HTTP/1.1\"\t{status_code}\t{referer}".format(
+                url=sample_url(),
+                ip=sample_ip(),
+                referer=sample_referer(),
+                status_code=sample_status_code(),
+                local_time=time_str)
+
             print(query_log)
             f.write(query_log + "\n")
             count = count - 1
