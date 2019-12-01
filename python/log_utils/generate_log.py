@@ -4,6 +4,7 @@
 # @Email   : adairchan.dream@gmail.com
 # @Date    :  2019/11/30 14:31
 import random
+import sys
 import time
 
 url_paths = [
@@ -77,4 +78,5 @@ def generate_log(count=10):
 
 
 if __name__ == '__main__':
-    generate_log()
+    count = int(sys.argv[1])
+    generate_log(count)
