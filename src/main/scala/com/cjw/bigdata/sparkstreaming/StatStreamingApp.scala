@@ -1,5 +1,7 @@
 package com.cjw.bigdata.sparkstreaming
 
+import com.cjw.bigdata.dao.CourseClickCountDAO
+import com.cjw.bigdata.domain.CourseClickCount
 import com.cjw.bigdata.utils.{ClickLog, DateUtils}
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.apache.spark.SparkConf
@@ -7,6 +9,8 @@ import org.apache.spark.streaming.{Seconds, StreamingContext}
 import org.apache.spark.streaming.kafka010.KafkaUtils
 import org.apache.spark.streaming.kafka010.LocationStrategies.PreferConsistent
 import org.apache.spark.streaming.kafka010.ConsumerStrategies.Subscribe
+
+import scala.collection.mutable.ListBuffer
 
 /**
  * 使用Spark Streaming处理Kafka过来的数据
@@ -60,7 +64,25 @@ object StatStreamingApp {
       ClickLog(infos(0), DateUtils.parseToMinute(infos(1)), courseId, infos(3).toInt, infos(4))
     })
 
-    cleanedData.print()
+    // 统计到现在为止实战课程的访问量
+    cleanedData.map(x => {
+      // HBase rowKey 设计：yyyymmdd_course
+      (x.time.substring(0, 8) + "_" + x.courseId, 1)
+    }).reduceByKey(_ + _).foreachRDD(rdd => {
+      rdd.foreachPartition(partitionRecords => {
+
+        val list = new ListBuffer[CourseClickCount]
+
+        partitionRecords.foreach(pair => {
+          list.append(CourseClickCount(pair._1, pair._2))
+        })
+
+        // 将数据写入到HBase
+        CourseClickCountDAO.save(list)
+
+      })
+    })
+
 
     ssc.start()
     ssc.awaitTermination()

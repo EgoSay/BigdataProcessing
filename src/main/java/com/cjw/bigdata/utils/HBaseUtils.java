@@ -22,7 +22,7 @@ public class HBaseUtils {
 
     private Connection conn = null;
 
-    public HBaseUtils() {
+    private HBaseUtils() {
         Configuration conf = HBaseConfiguration.create();
         conf.set("hbase.zookeeper.quorum", "hadoop1,hadoop2,hadoop3");
         conf.set("hbase.zookeeper.property.clientPort", "2181");
@@ -38,7 +38,7 @@ public class HBaseUtils {
     /**
      * 根据表名获取到Table实例
      */
-    private Table getTable(String tableName) {
+    public Table getTable(String tableName) {
 
         Table table = null;
 
@@ -59,7 +59,7 @@ public class HBaseUtils {
      * @param column HBase表的列
      * @param value  写入HBase表的值
      */
-    public void put(String tableName, String rowKey, String cf, String column, String value) {
+    private void put(String tableName, String rowKey, String cf, String column, String value) {
         Table table = getTable(tableName);
 
 
