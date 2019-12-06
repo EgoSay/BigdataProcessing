@@ -65,24 +65,30 @@ object StatStreamingApp {
     })
 
     // 统计到现在为止实战课程的访问量
+    /**
+     * https://www.sogou.com/web?query=Spark SQL实战
+     * ===>
+     * https:/www.sogou.com/web?query=Spark SQL实战
+     */
     cleanedData.map(x => {
-      // HBase rowKey 设计：yyyymmdd_course
-      (x.time.substring(0, 8) + "_" + x.courseId, 1)
+      val referer = x.referer.replaceAll("//", ".")
+      val splits = referer.split("/")
+      var host = ""
+      if (splits.length > 2) {
+        host = splits(1)
+      }
+      (host, x.courseId, x.time)
+    }).filter(_._1 != "").map(x => {
+      (x._3.substring(0, 8) + "_" + x._1 + "_" + x._2, 1)
     }).reduceByKey(_ + _).foreachRDD(rdd => {
-      rdd.foreachPartition(partitionRecords => {
-
+      rdd.foreachPartition(partition => {
         val list = new ListBuffer[CourseClickCount]
-
-        partitionRecords.foreach(pair => {
+        partition.foreach(pair => {
           list.append(CourseClickCount(pair._1, pair._2))
         })
-
-        // 将数据写入到HBase
         CourseClickCountDAO.save(list)
-
       })
     })
-
 
     ssc.start()
     ssc.awaitTermination()
