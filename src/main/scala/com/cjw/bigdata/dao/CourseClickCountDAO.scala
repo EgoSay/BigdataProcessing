@@ -15,7 +15,7 @@ import scala.collection.mutable.ListBuffer
 
 object CourseClickCountDAO {
 
-  val tableName = "course_clickcount"
+  val tableName = "course_search_clickCount"
   // cf: Column Family
   val cf = "info"
   val qualifer = "click_count"
@@ -28,7 +28,7 @@ object CourseClickCountDAO {
 
     val table = HBaseUtils.getInstance().getTable(tableName)
     for(ele <- resultList) {
-      table.incrementColumnValue(ele.day_course.getBytes(), cf.getBytes(), qualifer.getBytes(), ele.clickCount)
+      table.incrementColumnValue(ele.day_search_course.getBytes(), cf.getBytes(), qualifer.getBytes(), ele.clickCount)
     }
 
   }
