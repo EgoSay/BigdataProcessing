@@ -69,7 +69,11 @@
             <artifactId>netty-all</artifactId>
             <version>4.1.17.Final</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.typesafe.scala-logging</groupId>
+            <artifactId>scala-logging_2.11</artifactId>
+            <version>3.9.2</version>
+        </dependency>
 
 
     </dependencies>
