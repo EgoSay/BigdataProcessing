@@ -3,6 +3,7 @@ package com.cjw.bigdata.sparkstreaming
 import com.cjw.bigdata.dao.CourseClickCountDAO
 import com.cjw.bigdata.domain.CourseClickCount
 import com.cjw.bigdata.utils.{ClickLog, DateUtils}
+import com.typesafe.scalalogging.LazyLogging
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.apache.spark.SparkConf
 import org.apache.spark.streaming.{Seconds, StreamingContext}
@@ -20,7 +21,7 @@ import scala.collection.mutable.ListBuffer
  * @since 2019/12/1 12:20
  * @version 1.0
  */
-object StatStreamingApp {
+object StatStreamingApp extends LazyLogging{
 
   def main(args: Array[String]): Unit = {
 
@@ -84,10 +85,13 @@ object StatStreamingApp {
       rdd.foreachPartition(partition => {
         val list = new ListBuffer[CourseClickCount]
         partition.foreach(pair => {
-          println("pair{}" + pair)
+          logger.info("=========Current Time:" + System.currentTimeMillis() + ",当前数据:" + pair + "============")
           list.append(CourseClickCount(pair._1, pair._2))
         })
-        CourseClickCountDAO.save(list)
+        // 如果没数据不开启线程写HBase
+        if (list.nonEmpty) {
+          CourseClickCountDAO.save(list)
+        }
       })
     })
     cleanedData.print()

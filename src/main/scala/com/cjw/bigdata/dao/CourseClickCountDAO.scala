@@ -2,6 +2,7 @@ package com.cjw.bigdata.dao
 
 import com.cjw.bigdata.domain.CourseClickCount
 import com.cjw.bigdata.utils.HBaseUtils
+import com.typesafe.scalalogging.LazyLogging
 import org.apache.hadoop.hbase.client.Get
 import org.apache.hadoop.hbase.util.Bytes
 
@@ -13,7 +14,7 @@ import scala.collection.mutable.ListBuffer
  * @version 1.0
  */
 
-object CourseClickCountDAO {
+object CourseClickCountDAO extends LazyLogging{
 
   val tableName = "course_search_clickCount"
   // cf: Column Family
@@ -25,7 +26,7 @@ object CourseClickCountDAO {
    * @param resultList CourseClickCount集合
    */
   def save(resultList: ListBuffer[CourseClickCount]): Unit = {
-    println("保存数据{}" + resultList)
+    logger.info("Current Time:" + System.currentTimeMillis() + ",保存数据:" + resultList)
     val table = HBaseUtils.getInstance().getTable(tableName)
     for(ele <- resultList) {
       table.incrementColumnValue(ele.day_search_course.getBytes(), cf.getBytes(), qualifer.getBytes(), ele.clickCount)
