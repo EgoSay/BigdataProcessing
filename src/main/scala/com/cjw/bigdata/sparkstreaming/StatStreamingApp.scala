@@ -71,7 +71,7 @@ object StatStreamingApp {
      * https:/www.sogou.com/web?query=Spark SQL实战
      */
     cleanedData.map(x => {
-      val referer = x.referer.replaceAll("//", ".")
+      val referer = x.referer.replaceAll("//", "/")
       val splits = referer.split("/")
       var host = ""
       if (splits.length > 2) {
@@ -84,12 +84,13 @@ object StatStreamingApp {
       rdd.foreachPartition(partition => {
         val list = new ListBuffer[CourseClickCount]
         partition.foreach(pair => {
+          println("pair{}" + pair)
           list.append(CourseClickCount(pair._1, pair._2))
         })
         CourseClickCountDAO.save(list)
       })
     })
-
+    cleanedData.print()
     ssc.start()
     ssc.awaitTermination()
 

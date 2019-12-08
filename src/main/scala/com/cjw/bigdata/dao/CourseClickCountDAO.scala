@@ -25,7 +25,7 @@ object CourseClickCountDAO {
    * @param resultList CourseClickCount集合
    */
   def save(resultList: ListBuffer[CourseClickCount]): Unit = {
-
+    println("保存数据{}" + resultList)
     val table = HBaseUtils.getInstance().getTable(tableName)
     for(ele <- resultList) {
       table.incrementColumnValue(ele.day_search_course.getBytes(), cf.getBytes(), qualifer.getBytes(), ele.clickCount)
