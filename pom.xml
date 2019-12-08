@@ -14,7 +14,6 @@
         <hbase.version>1.1.2</hbase.version>
         <hadoop.version>2.6.5</hadoop.version>
     </properties>
-
     <dependencies>
 
         <!-- Spark Streaming依赖 -->
@@ -74,7 +73,6 @@
             <artifactId>scala-logging_2.11</artifactId>
             <version>3.9.2</version>
         </dependency>
-
 
     </dependencies>
 
