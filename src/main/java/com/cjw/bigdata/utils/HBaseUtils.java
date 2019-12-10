@@ -3,13 +3,15 @@ package com.cjw.bigdata.utils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.TableName;
-import org.apache.hadoop.hbase.client.Connection;
-import org.apache.hadoop.hbase.client.ConnectionFactory;
-import org.apache.hadoop.hbase.client.Put;
-import org.apache.hadoop.hbase.client.Table;
+import org.apache.hadoop.hbase.client.*;
+import org.apache.hadoop.hbase.filter.Filter;
+import org.apache.hadoop.hbase.filter.PrefixFilter;
 import org.apache.hadoop.hbase.util.Bytes;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
 
 
 /**
@@ -33,6 +35,15 @@ public class HBaseUtils {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private static HBaseUtils instance = null;
+
+    public  static synchronized HBaseUtils getInstance() {
+        if(null == instance) {
+            instance = new HBaseUtils();
+        }
+        return instance;
     }
 
     /**
@@ -74,22 +85,39 @@ public class HBaseUtils {
     }
 
 
-    private static HBaseUtils instance = null;
+    /**
+     * 根据表名和输入条件获取 HBase 的记录条数
+     */
+    public Map<String, Long> query(String tableName, String columnFamily, String qualifier, String condition) throws Exception{
 
-    public  static synchronized HBaseUtils getInstance() {
-        if(null == instance) {
-            instance = new HBaseUtils();
-        }
-        return instance;
+        HashMap<String, Long> map = new HashMap<>();
+        Table table = getTable(tableName);
+        Scan scan = new Scan();
+        Filter filter = new PrefixFilter(condition.getBytes());
+        scan.setFilter(filter);
+
+        ResultScanner results = table.getScanner(scan);
+        results.forEach(result -> {
+            String row = Bytes.toString(result.getRow());
+            long clickCount = Bytes.toLong(result.getValue(columnFamily.getBytes(), qualifier.getBytes()));
+            map.put(row, clickCount);
+        });
+
+        return map;
     }
 
-    public static void main(String[] args) {
-        String tableName = "course_clickcount" ;
-        String rowkey = "20191203_22";
-        String cf = "info" ;
-        String column = "click_count";
-        String value = "2";
 
-        HBaseUtils.getInstance().put(tableName, rowkey, cf, column, value);
+    public static void main(String[] args) throws Exception {
+        String tableName = "course_clickcount" ;
+        String rowkey = "20191210_22";
+        String condition = "2019";
+        String cf = "info" ;
+        String qualifier = "click_count";
+        String value = "4";
+        Map<String, Long> query = HBaseUtils.getInstance().query("course_search_clickCount", cf, qualifier, condition);
+        for(Map.Entry<String, Long> entry: query.entrySet()) {
+            System.out.println(entry.getKey() + " : " + entry.getValue());
+        }
+        HBaseUtils.getInstance().put(tableName, rowkey, cf, qualifier, value);
     }
 }

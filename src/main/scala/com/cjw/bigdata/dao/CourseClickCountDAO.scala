@@ -29,7 +29,7 @@ object CourseClickCountDAO extends LazyLogging{
     logger.info("Current Time:" + System.currentTimeMillis() + ",保存数据:" + resultList)
     val table = HBaseUtils.getInstance().getTable(tableName)
     for(ele <- resultList) {
-      table.incrementColumnValue(ele.day_search_course.getBytes(), cf.getBytes(), qualifer.getBytes(), ele.clickCount)
+      table.incrementColumnValue(Bytes.toBytes(ele.day_search_course), Bytes.toBytes(cf), Bytes.toBytes(qualifer), ele.clickCount)
     }
 
   }
