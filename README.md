@@ -1,5 +1,5 @@
 ## 概述
-基于Flume+Kafka+Spark Streaming的大数据流处理平台
+基于Flume+Kafka+Spark Streaming的大数据处理Demo
 
 ## 技术栈
 - Flume
@@ -20,20 +20,20 @@
 
 ### Spark整合Kafka
 
-- [x]功能
+- [x] 功能
     >Spark Streaming清洗日志数据, 统计到现在为止的课程访问统计量, 然后将其写入HBase
     ```markdown
     ## HBase表设计
-    create 'imooc_course_clickcount','info'
+    create 'course_clickcount','info'
     ## rowKey设计
     yyyymmmdd_courseId
     ```
     
-- [x]改进
+- [x] 改进
     >通过统计搜索引擎或者其他渠道引流过来的访问量进行统计，进行不同的引流渠道效果分析
     ```markdown
     ## HBase表设计
-    create 'imooc_course_search_clickcount','info'
+    create 'course_search_clickcount','info'
     ## rowKey设计
     yyyymmmdd_search_courseId
     ```
